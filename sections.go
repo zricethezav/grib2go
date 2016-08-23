@@ -67,8 +67,7 @@ type Section6 struct {
 
 type Section7 struct {
 	SectionHead
-	RawData []byte
-	Data    []int64
+	Data interface{}
 }
 
 // readBytes reads n bytes from file f
@@ -125,14 +124,16 @@ func SectionSix(f *os.File, sectionHead *SectionHead, currOffset uint64) (sectio
 	if sectionSix.BitmapIndicator == 0 {
 		// bytes 7 - nn describe the bitmap
 		fmt.Println("bitmapIndicator = 0")
-
+		sectionSix.Bitmap = readNBytes(f, uint32(sectionHead.Len-6))
 	}
 	return sectionSix
 }
 
 // SectionSeven
-func SectionSeven(f *os.File, sectionHead *SectionHead, currOffset uint64) {
+func SectionSeven(f *os.File, sectionHead *SectionHead, currOffset uint64) (sectionSeven Section7) {
 	fmt.Println("Enter Section Seven")
+	sectionSeven.Data = readNBytes(f, uint32(sectionHead.Len-5))
+	return sectionSeven
 }
 
 func SectionEight(f *os.File, sectionHead *SectionHead, currOffset uint64) {

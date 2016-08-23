@@ -80,6 +80,9 @@ type DataTemplate3 struct {
 	RefGroupLength         uint32
 	LengthIncr             uint8
 	TrueLengthLastGroup    uint32
+	NumBitsScaledLengths   uint8
+	SpatialDistOrder       uint8
+	NumBytesReqExtra       uint8
 }
 
 // TemplateHandler returns a template based on templateNumber and sectionNumber as an
@@ -117,6 +120,10 @@ func TemplateHandler(f *os.File, templateNumber uint16, sectionNumber uint8) int
 			return d0
 		case 1:
 			//TODO
+		case 3:
+			var d3 DataTemplate3
+			binary.Read(f, binary.BigEndian, &d3)
+			return d3
 		}
 	}
 	return 0

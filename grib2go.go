@@ -33,9 +33,12 @@ const (
 	GRIB_INDICATOR = "GRIB"
 )
 
-func CheckSection(f *os.File) (sectionHead SectionHead) {
+func CheckSection(f *os.File) (sectionHead SectionHead, endGrib bool) {
 	binary.Read(f, binary.BigEndian, &sectionHead)
-	return sectionHead
+	if sectionHead.Len == 926365495 {
+		return sectionHead, true
+	}
+	return sectionHead, false
 }
 
 // CheckError is a general error checker that panics if error e is not nil
@@ -74,11 +77,15 @@ func ProcessGrib(f *os.File) {
 		panic("Not Grib")
 	}
 	var sectionHead SectionHead
+	var endGrib bool
 	for {
 		var message Message
 		currOffset, _ := f.Seek(0, 1)
-		sectionHead = CheckSection(f)
-
+		sectionHead, endGrib = CheckSection(f)
+		if endGrib {
+			fmt.Println("DONE")
+			break
+		}
 		fmt.Println("---------------------")
 		fmt.Printf("Current Section: %d\nLength of Section: %d bytes\nCurrent Offset: byte %d\n",
 			sectionHead.Num, sectionHead.Len, currOffset)
@@ -98,13 +105,13 @@ func ProcessGrib(f *os.File) {
 		case SECTION_5:
 			message.SectionFive = SectionFive(f, &sectionHead, uint64(currOffset))
 		case SECTION_6:
-			SectionSix(f, &sectionHead, uint64(currOffset))
+			message.SectionSix = SectionSix(f, &sectionHead, uint64(currOffset))
 		case SECTION_7:
-			SectionSeven(f, &sectionHead, uint64(currOffset))
+			message.SectionSeven = SectionSeven(f, &sectionHead, uint64(currOffset))
 		case SECTION_8:
 			SectionEight(f, &sectionHead, uint64(currOffset))
 		}
-		if sectionHead.Num == SECTION_5 {
+		if sectionHead.Num == SECTION_8 {
 			currOffset, _ := f.Seek(0, 1)
 			fmt.Println("CURR OFFSET: ", currOffset)
 			break
