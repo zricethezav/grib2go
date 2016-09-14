@@ -92,6 +92,10 @@ func SectionTwo(f *os.File, sectionHead *SectionHead, currOffset uint64) (sectio
 }
 
 // SectionThree
+// Section 3 will vary depending upon the map projection the grid is defined.
+// A table listing more detailed information for each NDFD geographic region
+// (CONUS, CONUS subsectors, Puerto Rico, Hawaii, Guam, Alaska) can be found here.
+// Latitude and longitude values are encoded in 10 -6 degrees.  All longitudes are east.
 func SectionThree(f *os.File, sectionHead *SectionHead, currOffset uint64) (sectionThree Section3) {
 	fmt.Println("Enter Section Three")
 	readBytes(f, &sectionThree.Source, &sectionThree.DataPointCount,

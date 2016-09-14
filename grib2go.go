@@ -71,7 +71,10 @@ func verifyGrib(f *os.File) bool {
 	return true
 }
 
-/// ProcessGrib
+// ProcessGrib
+// NOTE: for the first file we process, refer to page 49 in
+// https://www.wmo.int/pages/prog/www/WMOCodes/Guides/GRIB/GRIB2_062006.pdf
+// This is a simple Grib2 message with one data set
 func ProcessGrib(f *os.File) {
 	if verifyGrib(f) == false {
 		panic("Not Grib")
@@ -87,28 +90,37 @@ func ProcessGrib(f *os.File) {
 			break
 		}
 		fmt.Println("---------------------")
-		fmt.Printf("Current Section: %d\nLength of Section: %d bytes\nCurrent Offset: byte %d\n",
+		fmt.Printf("Section: %d\nLength of Section: %d bytes\nCurrent Offset: byte %d\n",
 			sectionHead.Num, sectionHead.Len, currOffset)
 		switch sectionHead.Num {
 		case SECTION_1:
+			// Identification Section
 			message.SectionOne = SectionOne(f, &sectionHead, uint64(currOffset))
 			fmt.Printf("%+v\n\n", message.SectionOne)
 		case SECTION_2:
+			// Local Use Section
 			message.SectionTwo = SectionTwo(f, &sectionHead, uint64(currOffset))
 			fmt.Printf("%+v\n\n", message.SectionTwo)
 		case SECTION_3:
+			// Grid Definition Section
 			message.SectionThree = SectionThree(f, &sectionHead, uint64(currOffset))
 			fmt.Printf("%+v\n\n", message.SectionThree)
 		case SECTION_4:
+			// Product Definition Section
 			message.SectionFour = SectionFour(f, &sectionHead, uint64(currOffset))
 			fmt.Printf("%+v\n\n", message.SectionFour)
 		case SECTION_5:
+			// Data Representation Section
 			message.SectionFive = SectionFive(f, &sectionHead, uint64(currOffset))
+			fmt.Printf("%+v\n\n", message.SectionFive)
 		case SECTION_6:
+			// Bit Map Section
 			message.SectionSix = SectionSix(f, &sectionHead, uint64(currOffset))
 		case SECTION_7:
+			// Data Section
 			message.SectionSeven = SectionSeven(f, &sectionHead, uint64(currOffset))
 		case SECTION_8:
+			// End Section
 			SectionEight(f, &sectionHead, uint64(currOffset))
 		}
 		if sectionHead.Num == SECTION_8 {

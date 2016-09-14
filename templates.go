@@ -60,7 +60,7 @@ type DataTemplateDescriptor struct {
 	ReferenceValue     uint32
 	BinaryScaleFactor  uint16
 	DecimalScaleFactor uint16
-	NumBitsPack        uint8
+	NumBitsPack        uint8 // number of bits used for packed values in the data section
 	TypeFieldValue     uint8
 }
 
