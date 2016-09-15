@@ -134,9 +134,9 @@ func SectionSix(f *os.File, sectionHead *SectionHead, currOffset uint64) (sectio
 }
 
 // SectionSeven
-func SectionSeven(f *os.File, sectionHead *SectionHead, currOffset uint64) (sectionSeven Section7) {
+func SectionSeven(f *os.File, sectionHead *SectionHead, currOffset uint64, sectionFive *Section5) (sectionSeven Section7) {
 	fmt.Println("Enter Section Seven")
-	sectionSeven.Data = readNBytes(f, uint32(sectionHead.Len-5))
+	sectionSeven.Data = DataHandler(f, sectionFive, uint64(sectionHead.Len-5))
 	return sectionSeven
 }
 

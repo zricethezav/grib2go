@@ -81,8 +81,8 @@ func ProcessGrib(f *os.File) {
 	}
 	var sectionHead SectionHead
 	var endGrib bool
+	var message Message
 	for {
-		var message Message
 		currOffset, _ := f.Seek(0, 1)
 		sectionHead, endGrib = CheckSection(f)
 		if endGrib {
@@ -118,12 +118,12 @@ func ProcessGrib(f *os.File) {
 			message.SectionSix = SectionSix(f, &sectionHead, uint64(currOffset))
 		case SECTION_7:
 			// Data Section
-			message.SectionSeven = SectionSeven(f, &sectionHead, uint64(currOffset))
+			message.SectionSeven = SectionSeven(f, &sectionHead, uint64(currOffset), &(message.SectionFive))
 		case SECTION_8:
 			// End Section
 			SectionEight(f, &sectionHead, uint64(currOffset))
 		}
-		if sectionHead.Num == SECTION_8 {
+		if sectionHead.Num == SECTION_7 {
 			currOffset, _ := f.Seek(0, 1)
 			fmt.Println("CURR OFFSET: ", currOffset)
 			break
